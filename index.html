@@ -133,13 +133,13 @@
         applyGravity();
         onClick();
         fill(200);
+        drawOtherCircle();
         text(
           [points],
           windowDimensions.width / 2,
           windowDimensions.height / 2,
           10,
         );
-        drawOtherCircle();
         circle(circlePosition.x, circlePosition.y, circleSize);
         rotate(30);
         // text(["gravity", gravity.x, gravity.y], 100, 50);
