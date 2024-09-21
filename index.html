@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eater.Dropper</title>
+  </head>
+  <body>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"
+      type="module"
+    ></script>
+    <button id="startButton" onclick="onClick()">Start</button>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+      }
+      button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: black;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+    <script>
+      const padding = 10;
+      const circleSize = 100;
+      const gravity = {
+        x: 0,
+        y: 0,
+      };
+      const velocity = {
+        x: 0,
+        y: 0,
+      };
+      const circlePosition = {
+        x: null,
+        y: null,
+      };
+      const windowDimensions = {
+        width: null,
+        height: null,
+      };
+      let permissionGranted = false;
+      const frictionCoeff = 0.9;
+      const orientation = {
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
+      };
+      function applyGravity() {
+        frictionForce = {
+          x:
+            min(frictionCoeff * Math.abs(velocity.x), 0.5) *
+            ((velocity.x >> 31) - (-velocity.x >> 31)),
+          y:
+            min(frictionCoeff * Math.abs(velocity.y), 0.5) *
+            ((velocity.y >> 31) - (-velocity.y >> 31)),
+        };
+        gravity.x = rotationY * 2;
+        gravity.y = rotationX * 2;
+        velocity.x += gravity.x - frictionForce.x;
+        velocity.y += gravity.y - frictionForce.y;
+        circlePosition.x = constrain(
+          circlePosition.x + velocity.x,
+          0,
+          windowDimensions.width,
+        );
+        circlePosition.y = constrain(
+          circlePosition.y + velocity.y,
+          0,
+          windowDimensions.height,
+        );
+        if (circlePosition.x <= 0) {
+          circlePosition.x = 0;
+          velocity.x = 0;
+        }
+        if (circlePosition.x >= windowDimensions.width) {
+          circlePosition.x = windowDimensions.width;
+          velocity.x = 0;
+        }
+        if (circlePosition.y <= 0) {
+          circlePosition.y = 0;
+          velocity.y = 0;
+        }
+        if (circlePosition.y >= windowDimensions.height) {
+          circlePosition.y = windowDimensions.height;
+          velocity.y = 0;
+        }
+      }
+      function setup() {
+        windowDimensions.width = windowWidth - padding;
+        windowDimensions.height = windowHeight - padding;
+        circlePosition.x = windowDimensions.width / 2;
+        circlePosition.y = windowDimensions.height / 3;
+        otherCircle.x = random(windowDimensions.width);
+        otherCircle.y = random(windowDimensions.height);
+        console.log(circlePosition);
+        createCanvas(windowDimensions.width, windowDimensions.height);
+        fill(100);
+      }
+      let points = 0;
+      const otherCircle = {
+        x: null,
+        y: null,
+      };
+      function drawOtherCircle() {
+        if (
+          Math.round(circlePosition.x / 10) ===
+            Math.round(otherCircle.x / 10) &&
+          Math.round(circlePosition.y / 10) === Math.round(otherCircle.y / 10)
+        ) {
+          points += 1;
+          otherCircle.x = random(windowDimensions.width);
+          otherCircle.y = random(windowDimensions.height);
+        }
+        fill(50);
+        circle(otherCircle.x, otherCircle.y, circleSize);
+        fill(100);
+        textAlign(CENTER, CENTER);
+        textSize(100);
+      }
+      function draw() {
+        if (!permissionGranted) return;
+        background(0);
+        applyGravity();
+        onClick();
+        fill(200);
+        text(
+          [points],
+          windowDimensions.width / 2,
+          windowDimensions.height / 2,
+          10,
+        );
+        drawOtherCircle();
+        circle(circlePosition.x, circlePosition.y, circleSize);
+        rotate(30);
+        // text(["gravity", gravity.x, gravity.y], 100, 50);
+        // text(["velocity", velocity.x, velocity.y], 100, 100);
+        // text(["circlePosition", circlePosition.x, circlePosition.y], 100, 150);
+        // text(["permissionGranted", permissionGranted], 100, 200);
+        // text(["rotationY", rotationY], 100, 250);
+        // text(["rotationX", rotationX], 100, 300);
+        // text(["alpha", orientation.alpha], 100, 350);
+        // text(["beta", orientation.beta], 100, 400);
+        // text(["gamma", orientation.gamma], 100, 450);
+        // text(["finalVelocity", velocity.x, velocity.y], 100, 500);
+      }
+      function onClick() {
+        if (typeof DeviceMotionEvent.requestPermission === "function") {
+          // For iOS 13+ devices
+          DeviceMotionEvent.requestPermission()
+            .then((state) => {
+              if (state === "granted") {
+                permissionGranted = true;
+                document.getElementById("startButton").style.display = "none";
+              } else {
+                text(["permissionGranted", state], 100, 200);
+              }
+            })
+            .catch(console.error);
+        } else {
+          // For other devices
+          permissionGranted = true;
+          document.getElementById("startButton").style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
