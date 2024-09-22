@@ -11,6 +11,7 @@
       type="module"
     ></script>
     <button id="startButton" onclick="onClick()">Start</button>
+    <p ariaLabel="hidden message">Happy Birthday, Nad!</p>
     <style>
       body {
         margin: 0;
@@ -27,6 +28,10 @@
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
+      }
+      p {
+        position: absolute;
+        color: black;
       }
     </style>
     <script>
@@ -170,6 +175,7 @@
           // For other devices
           permissionGranted = true;
           document.getElementById("startButton").style.display = "none";
+          document.getElementById("hiddenMessage").style.display = "none";
         }
       }
     </script>
